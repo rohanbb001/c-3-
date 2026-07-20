@@ -1,0 +1,34 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int n;
+    printf("몇 개의 원소를 할당하겠습니까?: ");
+    scanf("%d", &n);
+
+    // 1차원 배열 동적 할당
+    int *arr = (int *)malloc(sizeof(int) * n);
+    int sum = 0;
+
+    for (int i = 0; i < n; i++) {
+        printf("정수형 데이터 입력: ");
+        scanf("%d", &arr[i]);
+        sum += arr[i];
+    }
+
+    int max = arr[0];
+    int min = arr[0];
+
+    for (int i = 1; i < n; i++) {
+        if (arr[i] > max) max = arr[i];
+        if (arr[i] < min) min = arr[i];
+    }
+
+    printf("\n최대값: %d\n", max);
+    printf("최소값: %d\n", min);
+    printf("전체합: %d\n", sum);
+    printf("평균: %f\n", (double)sum / n);
+
+    free(arr); // 메모리 해제
+    return 0;
+}
