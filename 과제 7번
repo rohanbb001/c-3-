@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// 스택 구조체 정의 (동적 배열 활용)
+typedef struct {
+    char **data;
+    int top;
+    int capacity;
+} Stack;
+
+void init_stack(Stack *s, int cap) {
+    s->capacity = cap;
+    s->top = -1;
+    s->data = (char **)malloc(sizeof(char *) * cap);
+}
+
+void push(Stack *s, char *val) {
+    s->data[++(s->top)] = strdup(val);
+}
+
+char* pop(Stack *s) {
+    if (s->top == -1) return NULL;
+    return s->data[(s->top)--];
+}
+
+char* peek(Stack *s) {
+    if (s->top == -1) return NULL;
+    return s->data[s->top];
+}
+
+int main() {
+    char input[200] = "<div><p>HELLO,<b>world</b>!</p></div>";
+    printf("입력 : %s\n출력 :\n", input);
+
+    Stack s;
+    init_stack(&s, 50);
+
+    int len = strlen(input);
+    int i = 0;
+
+    while (i < len) {
+        if (input[i] == '<') {
+            int j = i;
+            while (input[j] != '>') j++;
+            
+            // 태그 추출 (예: div, /div, p 등)
+            int tag_len = j - i - 1;
+            char *tag = (char *)malloc(tag_len + 1);
+            strncpy(tag, &input[i + 1], tag_len);
+            tag[tag_len] = '\0';
+
+            if (tag[0] != '/') { // 여는 태그
+                push(&s, tag);
+                printf("<%s>\n", tag);
+            } else { // 닫는 태그
+                char *pop_tag = pop(&s);
+                if (pop_tag == NULL || strcmp(pop_tag, &tag[1]) != 0) {
+                    printf("\n[오류] 잘못된 태그 매칭 구조입니다!\n");
+                    return -1;
+                }
+                printf("<%s>\n", tag);
+                free(pop_tag);
+            }
+            free(tag);
+            i = j + 1;
+        } else { // 일반 텍스트 문자열 처리
+            int j = i;
+            while (j < len && input[j] != '<') j++;
+            
+            int txt_len = j - i;
+            char *txt = (char *)malloc(txt_len + 1);
+            strncpy(txt, &input[i], txt_len);
+            txt[txt_len] = '\0';
+            
+            printf("%s\n", txt);
+            free(txt);
+            i = j;
+        }
+    }
+
+    if (s.top != -1) {
+        printf("\n[오류] 닫히지 않은 태그가 존재합니다.\n");
+    }
+
+    free(s.data);
+    return 0;
+}
