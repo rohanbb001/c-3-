@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int N1, N2;
+    printf("N1 N2 입력 (홀수만): ");
+    scanf("%d %d", &N1, &N2);
+
+    int **arr = (int **)malloc(sizeof(int *) * N1);
+    for (int i = 0; i < N1; i++) {
+        arr[i] = (int *)malloc(sizeof(int) * N2);
+    }
+
+    // 마름모 이동을 위한 방향 벡터 (좌하, 우하, 우상, 좌상)
+    int dr[] = {1, 1, -1, -1};
+    int dc[] = {-1, 1, 1, -1};
+
+    // 시작점 설정 (맨 위 중앙에서 왼쪽 위 칸)
+    int r = 0, c = N2 / 2;
+    int num = N1 * N2; 
+    int step = N2 / 2; // 한 변의 이동 횟수 조절용
+
+    // 바깥 사각형부터 하나씩 채우기
+    while (num > 0) {
+        if (step == 0) {
+            arr[r][c] = num--;
+            break;
+        }
+
+        // 4개의 변을 따라 마름모 그리기
+        for (int dir = 0; dir < 4; dir++) {
+            for (int s = 0; s < step; s++) {
+                arr[r][c] = num--;
+                r += dr[dir];
+                c += dc[dir];
+            }
+        }
+        // 안쪽 레이어로 진입 (한 단계 아래 행, 한 변의 길이 줄임)
+        r += 1;
+        step--;
+    }
+
+    // 출력
+    for (int i = 0; i < N1; i++) {
+        for (int j = 0; j < N2; j++) {
+            printf("%2d ", arr[i][j]);
+        }
+        printf("\n");
+    }
+
+    for (int i = 0; i < N1; i++) free(arr[i]);
+    free(arr);
+    return 0;
+}
